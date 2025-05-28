@@ -8,12 +8,14 @@ def parse_args():
     parser = argparse.ArgumentParser(
         description="Convert NSMBU challenge replays to title screen replays."
     )
-    parser.add_argument("input", help="Path to input .dat replay file")
-    parser.add_argument("output", help="Path to save the converted replay file")
+    parser.add_argument("inputreplay", help="Path to input .dat replay file")
+    parser.add_argument("outputreplay", nargs='?', default='<NULL>', help="Path to save the converted replay file")
+    parser.add_argument("-L", "--level", help="Print which level this replay is for", action="store_true")
     return parser.parse_args()
 
 args = parse_args()
-
+    
+    
 # Ensures that the input replay file is valid
 def validateReplayFile(data):
     if data[:4] != b'RPRH': # Check for a valid NSMBU replay file
@@ -37,15 +39,28 @@ def calculateReplayChecksum(data):
     replayCRC32Packed = struct.pack(">L", crc32_value)
     return replayCRC32Packed
 
-if os.path.exists(args.output):
-    raise FileExistsError(f"ERROR: Output file '{args.output}' already exists! Choose an unused one.")
+if args.level:
+    with open(args.inputreplay, mode='r+b') as file:
+        data = bytearray(file.read())
+        validateReplayFile(data)
+        worldNumber = (data[0x1C] + 1)
+        levelNumber = (data[0x1D] + 1)
+        print(f"Challenge replay '{args.inputreplay}' is for level {worldNumber}-{levelNumber}")
+        sys.exit()
+        
+if os.path.exists(args.outputreplay):
+    raise FileExistsError(f"ERROR: Output file '{args.outputreplay}' already exists! Choose an unused one.")
 
-with open(args.input, mode='r+b') as file:
+if args.outputreplay == '<NULL>':
+   print("ERROR: The output destination hasn't been entered!")
+   sys.exit()
+        
+with open(args.inputreplay, mode='r+b') as file:
     data = bytearray(file.read())
     validateReplayFile(data)
     convertToTitleReplay(data)
     
 # Save the modified replay
-with open(args.output, 'wb') as output:
+with open(args.outputreplay, 'wb') as output:
    output.write((data[:-4]) + calculateReplayChecksum(data)) # data[:-4]) is the entire replay data minus the last 4 bytes which contains the CRC32 checksum
    print("Replay converted!")
