@@ -5,7 +5,7 @@ This tool will not work for New Super Mario Bros. U Deluxe replay files. Perhaps
 This is a little script I made to automate the process of converting NSMBU challenge replays as a way of creating custom title replays of sorts.
 (Said title replays can found under `content/Common/replay/title`).
 
-In order to do so, you need to create a custom challenge that contains the level you want to make a custom replay for. Unfortunately, the selection of levels that the game randomly picks one to play a replay for is hardcoded, so you can only replace these levels:
+In order to do so, you need to create a custom challenge that contains the level you want to make a custom title replay for. Unfortunately, the selection of levels that the game randomly picks to play a replay for is hardcoded, so you can only replace these levels:
 
 ```
 title000.dat: 1-1
